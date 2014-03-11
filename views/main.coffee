@@ -44,7 +44,7 @@ String::tokens = ->
     MULTIPLELINECOMMENT
     ONECHAROPERATORS
   ]
-  RESERVED_WORD = p: "P"
+  RESERVED_WORD = p: "P" const: "const" var: "var" procedure "procedure" call: "call" begin: "begin" end: "end" if: "if" then: "then" while: "while" do: "do" odd: "odd"
   
   # Make a token object.
   make = (type, value) ->
@@ -116,6 +116,7 @@ parse = (input) ->
             lookahead.value + "' near '" + 
             input.substr(lookahead.from) + "'"
     return
+
 
   statements = ->
     result = [statement()]
