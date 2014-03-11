@@ -180,7 +180,28 @@ parse = (input) ->
        match ";"
        resultarr.concat resultvar
 
-
+    if lookahead and lookahead.type is "procedure"
+       while lookahead and lookahead.type is "procedure"
+         match "procedure"
+         resultwhile = [proced()]
+         proced = ->
+           result = null
+           if lookahead and lookahead.type is "ID"
+             match "ID"
+             match ";"
+             result =
+               type: "Var ID"
+               block: block()
+           else # Error!
+           throw "Syntax Error. Expected ID but found " + 
+             (if lookahead then lookahead.value else "end of input") + 
+             " near '#{input.substr(lookahead.from)}'"
+           result
+       resultproc =
+         procedures: resultwhile
+         statement: statement()
+       resultarr.concat resultproc
+      
     resultarr
 
   statements = ->
