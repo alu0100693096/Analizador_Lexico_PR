@@ -118,6 +118,64 @@ parse = (input) ->
     return
 
 
+  program = ->
+    result = block()
+    match "."
+
+  block = ->
+    resultarr = []
+    if lookahead and lookahead.type is "const"
+       match "constante"
+       resultconst = [constante()]
+       constante = ->
+         result = null
+         if lookahead and lookahead.type is "ID"
+           aleft =
+             type: "ID"
+             value: lookahead.value
+           match "="
+           if lookahead and lookahead.type is "NUM"
+             aright =
+               type: "NUM"
+               value: lookahead.value
+           else # Error!
+           throw "Syntax Error. Expected NUM but found " + 
+             (if lookahead then lookahead.value else "end of input") + 
+             " near '#{input.substr(lookahead.from)}'"
+         else # Error!
+         throw "Syntax Error. Expected ID but found " + 
+           (if lookahead then lookahead.value else "end of input") + 
+           " near '#{input.substr(lookahead.from)}'"
+         val =
+           left: aleft
+           right: aright
+         result =
+           type: "const"
+           value: val
+         result
+      while lookahead and lookahead.type is ","
+        match ","
+        resultconst.push constante()
+      match ";"
+      resultarr.concat resultconst
+    
+    if lookahead and lookahead.type is "var"
+       match "var"
+       resultvar = [variable()]
+       variable = ->
+         result = null
+         result =
+           type: "var"
+           value: lookahead.value
+
+         result
+       while lookahead and lookahead.type is ","
+         match ","
+         resultvar.push variable()
+       match ";"
+       resultarr.concat resultvar
+    resultarr
+
   statements = ->
     result = [statement()]
     while lookahead and lookahead.type is ";"
