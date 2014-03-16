@@ -243,6 +243,20 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "CALL"
+      match "CALL"
+      result =
+        type: "CALL"
+        value: lookahead.value
+      match "ID"
+    else if lookahead and lookahead.type is "BEGIN"
+      match "BEGIN"
+      result = [statement()]
+      match ";"
+      while lookahead and lookahead.type is not "END"
+      	result.push statement()
+	match ";"
+      match "END"
     else if lookahead and lookahead.type is "IF"
       match "IF"
       left = condition()
@@ -250,6 +264,15 @@ parse = (input) ->
       right = statement()
       result =
         type: "IF"
+        left: left
+        right: right
+    else if lookahead and lookahead.type is "WHILE"
+      match "WHILE"
+      left = condition()
+      match "THEN"
+      right = statement()
+      result =
+        type: "WHILE"
         left: left
         right: right
     else # Error!
