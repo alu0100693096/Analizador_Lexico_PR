@@ -335,6 +335,13 @@ parse = (input) ->
         type: "*"
         left: result
         right: right
+    else if lookahead and lookahead.type is "/"
+      match "/"
+      right = term()
+      result =
+        type: "/"
+        left: result
+        right: right
     result
 
   factor = ->
