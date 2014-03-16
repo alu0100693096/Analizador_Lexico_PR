@@ -305,12 +305,23 @@ parse = (input) ->
     result
 
   expression = ->
+    if lookahead and lookahead.type is "+"
+      match "+"
+    if lookahead and lookahead.type is "-"
+      match "-"
     result = term()
     if lookahead and lookahead.type is "+"
       match "+"
       right = expression()
       result =
         type: "+"
+        left: result
+        right: right
+    if lookahead and lookahead.type is "-"
+      match "-"
+      right = expression()
+      result =
+        type: "-"
         left: result
         right: right
     result
