@@ -34,6 +34,7 @@ String::tokens = ->
   STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g
   ONELINECOMMENT = /\/\/.*/g
   MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
+  COMPARISONOPERATOR: /[<>=!]=|[<>]/g
   ONECHAROPERATORS = /([-+*\/=()&|;:,<>{}[\]])/g
   tokens = [
     WHITES
@@ -108,6 +109,10 @@ String::tokens = ->
     else if m = STRING.bexec(this)
       result.push make("STRING", 
                         getTok().replace(/^["']|["']$/g, ""))
+    
+    # comparison
+    else if m = tokens.COMPARISONOPERATOR.bexec(this)
+      result.push make("COMPARISON", getTok())
     
     # single-character operator
     else if m = ONECHAROPERATORS.bexec(this)
@@ -282,14 +287,21 @@ parse = (input) ->
     result
 
   condition = ->
-    left = expression()
-    type = lookahead.value
-    match "COMPARISON"
-    right = expression()
-    result =
-      type: type
-      left: left
-      right: right
+    if lookahead and lookahead.type is "ODD"
+      match "ODD"
+      right = expression()
+      result =
+        type: "ODD"
+        value: right
+    else
+    	left = expression()
+    	type = lookahead.value
+    	match "COMPARISON"
+    	right = expression()
+    	result =
+      	  type: type
+          left: left
+      	  right: right
     result
 
   expression = ->
