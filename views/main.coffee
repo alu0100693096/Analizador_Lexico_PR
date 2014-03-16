@@ -44,7 +44,19 @@ String::tokens = ->
     MULTIPLELINECOMMENT
     ONECHAROPERATORS
   ]
-  RESERVED_WORD = p: "P" const: "const" var: "var" procedure "procedure" call: "call" begin: "begin" end: "end" if: "if" then: "then" while: "while" do: "do" odd: "odd"
+  RESERVED_WORD = 
+	p: "P" 
+	const: "const" 
+	var: "var" 
+	procedure: "procedure" 
+	call: "call" 
+	begin: "begin" 
+	end: "end" 
+	if: "if" 
+	then: "then" 
+	while: "while" 
+	do: "do" 
+	odd: "odd"
   
   # Make a token object.
   make = (type, value) ->
@@ -231,10 +243,30 @@ parse = (input) ->
       result =
         type: "P"
         value: right
+    else if lookahead and lookahead.type is "IF"
+      match "IF"
+      left = condition()
+      match "THEN"
+      right = statement()
+      result =
+        type: "IF"
+        left: left
+        right: right
     else # Error!
       throw "Syntax Error. Expected identifier but found " + 
         (if lookahead then lookahead.value else "end of input") + 
         " near '#{input.substr(lookahead.from)}'"
+    result
+
+  condition = ->
+    left = expression()
+    type = lookahead.value
+    match "COMPARISON"
+    right = expression()
+    result =
+      type: type
+      left: left
+      right: right
     result
 
   expression = ->
