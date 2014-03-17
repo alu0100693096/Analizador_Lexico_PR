@@ -35,7 +35,9 @@ String::tokens = ->
   ONELINECOMMENT = /\/\/.*/g
   MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
   COMPARISONOPERATOR: /[<>=!]=|[<>]/g
-  ONECHAROPERATORS = /([-+*\/=()&|;:,<>{}[\]])/g
+  ADDOP: /[+-]/g
+  MULTOP: /[*\/]/g
+  ONECHAROPERATORS = /([=()&|;:,<>{}[\]])/g
   tokens = [
     WHITES
     ID
@@ -114,6 +116,14 @@ String::tokens = ->
     else if m = tokens.COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
     
+    # addop
+    else if m = tokens.ADDOP.bexec(this)
+      result.push make("ADDOP", getTok())
+    
+    # multop
+    else if m = tokens.MULTOP.bexec(this)
+      result.push make("MULTOP", getTok())
+    
     # single-character operator
     else if m = ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -141,8 +151,8 @@ parse = (input) ->
 
   block = ->
     resultarr = []
-    if lookahead and lookahead.type is "const"
-       match "constante"
+    if lookahead and lookahead.type is "CONST"
+       match "CONST"
        resultconst = [constante()]
        constante = ->
          result = null
@@ -305,41 +315,25 @@ parse = (input) ->
     result
 
   expression = ->
-    if lookahead and lookahead.type is "+"
-      match "+"
-    if lookahead and lookahead.type is "-"
-      match "-"
     result = term()
-    if lookahead and lookahead.type is "+"
-      match "+"
-      right = expression()
+    while lookahead and lookahead.type is "ADDOP"
+      type = lookahead.value
+      match "ADDOP"
+      right = term()
       result =
-        type: "+"
-        left: result
-        right: right
-    if lookahead and lookahead.type is "-"
-      match "-"
-      right = expression()
-      result =
-        type: "-"
+        type: type
         left: result
         right: right
     result
 
   term = ->
     result = factor()
-    if lookahead and lookahead.type is "*"
-      match "*"
-      right = term()
+    while lookahead and lookahead.type is "MULTOP"
+      type = lookahead.value
+      match "MULTOP"
+      right = factor()
       result =
-        type: "*"
-        left: result
-        right: right
-    else if lookahead and lookahead.type is "/"
-      match "/"
-      right = term()
-      result =
-        type: "/"
+        type: type
         left: result
         right: right
     result
