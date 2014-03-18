@@ -1,2 +1,9 @@
-a = 3 + (4;
-b = 5
+CONST x = 0;
+VAR a, b, c;
+
+BEGIN
+   IF a == 1 HEN
+      WHILE b <= 5 DO
+         a = a + 1
+END.
+

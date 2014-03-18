@@ -1,1 +1,8 @@
-a = 4
+CONST x = 0;
+VAR a, b, c;
+
+BEGIN
+   IF a == 1 THEN
+      WHILE b <= 5 DO
+         a = a + 1
+END.
