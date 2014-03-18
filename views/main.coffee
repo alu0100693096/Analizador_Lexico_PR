@@ -34,9 +34,9 @@ String::tokens = ->
   STRING = /('(\\.|[^'])*'|"(\\.|[^"])*")/g
   ONELINECOMMENT = /\/\/.*/g
   MULTIPLELINECOMMENT = /\/[*](.|\n)*?[*]\//g
-  COMPARISONOPERATOR: /[<>=!]=|[<>]/g
-  ADDOP: /[+-]/g
-  MULTOP: /[*\/]/g
+  COMPARISONOPERATOR = /[<>=!]=|[<>]/g
+  ADDOP = /[+-]/g
+  MULTOP = /[*\/]/g
   ONECHAROPERATORS = /([=()&|;:,<>{}[\]])/g
   tokens = [
     WHITES
@@ -45,24 +45,24 @@ String::tokens = ->
     STRING
     ONELINECOMMENT
     MULTIPLELINECOMMENT
-    COMPARISONOPERATORS
+    COMPARISONOPERATOR
     ADDOP
     MULTOP
     ONECHAROPERATORS
   ]
-  RESERVED_WORD = 
-	p: "P" 
-	const: "const" 
-	var: "var" 
-	procedure: "procedure" 
-	call: "call" 
-	begin: "begin" 
-	end: "end" 
-	if: "if" 
-	then: "then" 
-	while: "while" 
-	do: "do" 
-	odd: "odd"
+  RESERVED_WORDS =
+    p: "P" 
+    const: "const" 
+    var: "var" 
+    procedure: "procedure" 
+    call: "call" 
+    begin: "begin" 
+    end: "end" 
+    if: "if" 
+    then: "then" 
+    while: "while" 
+    do: "do" 
+    odd: "odd"
   
   # Make a token object.
   make = (type, value) ->
@@ -96,7 +96,7 @@ String::tokens = ->
     
     # name.
     else if m = ID.bexec(this)
-      rw = RESERVED_WORD[m[0]]
+      rw = RESERVED_WORDS[m[0]]
       if rw
         result.push make(rw, getTok())
       else
@@ -116,15 +116,15 @@ String::tokens = ->
                         getTok().replace(/^["']|["']$/g, ""))
     
     # comparison
-    else if m = tokens.COMPARISONOPERATOR.bexec(this)
+    else if m = COMPARISONOPERATOR.bexec(this)
       result.push make("COMPARISON", getTok())
     
     # addop
-    else if m = tokens.ADDOP.bexec(this)
+    else if m = ADDOP.bexec(this)
       result.push make("ADDOP", getTok())
     
     # multop
-    else if m = tokens.MULTOP.bexec(this)
+    else if m = MULTOP.bexec(this)
       result.push make("MULTOP", getTok())
     
     # single-character operator
@@ -200,7 +200,7 @@ parse = (input) ->
              type: "Var ID"
              value: lookahead.value
            match "ID"
-	 else # Error!
+         else # Error!
          throw "Syntax Error. Expected ID but found " + 
            (if lookahead then lookahead.value else "end of input") + 
            " near '#{input.substr(lookahead.from)}'"
@@ -249,7 +249,6 @@ parse = (input) ->
       left =
         type: "ID"
         value: lookahead.value
-
       match "ID"
       match "="
       right = expression()
@@ -274,8 +273,8 @@ parse = (input) ->
       result = [statement()]
       match ";"
       while lookahead and lookahead.type is not "END"
-      	result.push statement()
-	match ";"
+        result.push statement()
+        match ";"
       match "END"
     else if lookahead and lookahead.type is "IF"
       match "IF"
