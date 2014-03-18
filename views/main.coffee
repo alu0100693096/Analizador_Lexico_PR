@@ -37,7 +37,7 @@ String::tokens = ->
   COMPARISONOPERATOR = /[<>=!]=|[<>]/g
   ADDOP = /[+-]/g
   MULTOP = /[*\/]/g
-  ONECHAROPERATORS = /([=()&|;:,<>{}[\]])/g
+  ONECHAROPERATORS = /([=()&|;:,\.<>{}[\]])/g
   tokens = [
     WHITES
     ID
@@ -52,17 +52,17 @@ String::tokens = ->
   ]
   RESERVED_WORDS =
     p: "P" 
-    const: "const" 
-    var: "var" 
-    procedure: "procedure" 
-    call: "call" 
-    begin: "begin" 
-    end: "end" 
-    if: "if" 
-    then: "then" 
-    while: "while" 
-    do: "do" 
-    odd: "odd"
+    const: "CONST" 
+    var: "VAR" 
+    procedure: "PROCEDURE" 
+    call: "CALL" 
+    begin: "BEGIN" 
+    end: "END" 
+    if: "IF" 
+    then: "THEN" 
+    while: "WHILE" 
+    do: "DO" 
+    odd: "ODD"
   
   # Make a token object.
   make = (type, value) ->
@@ -150,14 +150,18 @@ parse = (input) ->
 
   program = ->
     result = block()
-    match "."
+    if lookahead and lookahead.type is "."
+      match "."
+    else
+      throw "Syntax Error. Expected '.' Remember to end
+                 your input with a ."
+    result
 
   block = ->
     resultarr = []
 
     if lookahead and lookahead.type is "CONST"
        match "CONST"
-       resultconst = [constante()]
        constante = ->
          result = null
          if lookahead and lookahead.type is "ID"
@@ -172,27 +176,26 @@ parse = (input) ->
                value: lookahead.value
              match "NUM"
            else # Error!
-           throw "Syntax Error. Expected NUM but found " + 
-             (if lookahead then lookahead.value else "end of input") + 
-             " near '#{input.substr(lookahead.from)}'"
+             throw "Syntax Error. Expected NUM but found " + 
+                   (if lookahead then lookahead.value else "end of input") + 
+                   " near '#{input.substr(lookahead.from)}'"
          else # Error!
-         throw "Syntax Error. Expected ID but found " + 
-           (if lookahead then lookahead.value else "end of input") + 
-           " near '#{input.substr(lookahead.from)}'"
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
          result =
            type: "="
            left: left
            right: right
          result
-      while lookahead and lookahead.type is ","
-        match ","
-        resultconst.push constante()
-      match ";"
-      resultarr.concat resultconst
+       resultarr.push constante()
+       while lookahead and lookahead.type is ","
+         match ","
+         resultarr.push constante()
+       match ";"
     
     if lookahead and lookahead.type is "var"
        match "var"
-       resultvar = [variable()]
        variable = ->
          result = null
          if lookahead and lookahead.type is "ID"
@@ -201,39 +204,36 @@ parse = (input) ->
              value: lookahead.value
            match "ID"
          else # Error!
-         throw "Syntax Error. Expected ID but found " + 
-           (if lookahead then lookahead.value else "end of input") + 
-           " near '#{input.substr(lookahead.from)}'"
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
          result
+       resultarr.push variable()
        while lookahead and lookahead.type is ","
          match ","
-         resultvar.push variable()
+         resultarr.push variable()
        match ";"
-       resultarr.concat resultvar
-
-    if lookahead and lookahead.type is "procedure"  
-       resultproc = [proced()]
-       proced = ->
-         result = null
-         match "procedure"
-         if lookahead and lookahead.type is "ID"
-           value = lookahead.value
-           match "ID"
-           match ";"
-           result =
-             type: "Procedure"
-             value: value
-             left: block()
-           match ";"
-         else # Error!
-         throw "Syntax Error. Expected ID but found " + 
-           (if lookahead then lookahead.value else "end of input") + 
-           " near '#{input.substr(lookahead.from)}'"
-         result
-       while lookahead and lookahead.type is "procedure"
-         resultproc.push proced()
-       resultproc.push statement()
-       resultarr.concat resultproc
+  
+    proced = ->
+      result = null
+      match "procedure"
+      if lookahead and lookahead.type is "ID"
+        value = lookahead.value
+        match "ID"
+        match ";"
+        result =
+          type: "Procedure"
+          value: value
+          left: block()
+        match ";"
+      else # Error!
+        throw "Syntax Error. Expected ID but found " + 
+              (if lookahead then lookahead.value else "end of input") + 
+              " near '#{input.substr(lookahead.from)}'"
+      result
+    while lookahead and lookahead.type is "procedure"
+      resultarr.push proced()
+    resultarr.push statement()
     resultarr
 
   statements = ->
@@ -296,8 +296,8 @@ parse = (input) ->
         right: right
     else # Error!
       throw "Syntax Error. Expected identifier but found " + 
-        (if lookahead then lookahead.value else "end of input") + 
-        " near '#{input.substr(lookahead.from)}'"
+            (if lookahead then lookahead.value else "end of input") + 
+            " near '#{input.substr(lookahead.from)}'"
     result
 
   condition = ->
@@ -362,13 +362,13 @@ parse = (input) ->
       match ")"
     else # Throw exception
       throw "Syntax Error. Expected number or identifier or '(' but found " + 
-        (if lookahead then lookahead.value else "end of input") + 
-        " near '" + input.substr(lookahead.from) + "'"
+            (if lookahead then lookahead.value else "end of input") + 
+            " near '" + input.substr(lookahead.from) + "'"
     result
 
-  tree = statements(input)
+  tree = program(input)
   if lookahead?
     throw "Syntax Error parsing statements. " + 
-      "Expected 'end of input' and found '" + 
-      input.substr(lookahead.from) + "'"  
+          "Expected 'end of input' and found '" + 
+          input.substr(lookahead.from) + "'"  
   tree
