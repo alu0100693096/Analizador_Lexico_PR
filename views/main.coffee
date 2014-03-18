@@ -51,18 +51,18 @@ String::tokens = ->
     ONECHAROPERATORS
   ]
   RESERVED_WORDS =
-    p: "P" 
-    const: "CONST" 
-    var: "VAR" 
-    procedure: "PROCEDURE" 
-    call: "CALL" 
-    begin: "BEGIN" 
-    end: "END" 
-    if: "IF" 
-    then: "THEN" 
-    while: "WHILE" 
-    do: "DO" 
-    odd: "ODD"
+    P: "P" 
+    CONST: "CONST" 
+    VAR: "VAR" 
+    PROCEDURE: "PROCEDURE" 
+    CALL: "CALL" 
+    BEGIN: "BEGIN" 
+    END: "END" 
+    IF: "IF" 
+    THEN: "THEN" 
+    WHILE: "WHILE" 
+    DO: "DO" 
+    ODD: "ODD"
   
   # Make a token object.
   make = (type, value) ->
@@ -194,8 +194,8 @@ parse = (input) ->
          resultarr.push constante()
        match ";"
     
-    if lookahead and lookahead.type is "var"
-       match "var"
+    if lookahead and lookahead.type is "VAR"
+       match "VAR"
        variable = ->
          result = null
          if lookahead and lookahead.type is "ID"
@@ -216,7 +216,7 @@ parse = (input) ->
   
     proced = ->
       result = null
-      match "procedure"
+      match "PROCEDURE"
       if lookahead and lookahead.type is "ID"
         value = lookahead.value
         match "ID"
@@ -231,7 +231,7 @@ parse = (input) ->
               (if lookahead then lookahead.value else "end of input") + 
               " near '#{input.substr(lookahead.from)}'"
       result
-    while lookahead and lookahead.type is "procedure"
+    while lookahead and lookahead.type is "PROCEDURE"
       resultarr.push proced()
     resultarr.push statement()
     resultarr
@@ -271,10 +271,9 @@ parse = (input) ->
     else if lookahead and lookahead.type is "BEGIN"
       match "BEGIN"
       result = [statement()]
-      match ";"
-      while lookahead and lookahead.type is not "END"
-        result.push statement()
+      while lookahead and lookahead.type is ";"
         match ";"
+        result.push statement()
       match "END"
     else if lookahead and lookahead.type is "IF"
       match "IF"
@@ -288,7 +287,7 @@ parse = (input) ->
     else if lookahead and lookahead.type is "WHILE"
       match "WHILE"
       left = condition()
-      match "THEN"
+      match "DO"
       right = statement()
       result =
         type: "WHILE"
@@ -313,9 +312,9 @@ parse = (input) ->
     	match "COMPARISON"
     	right = expression()
     	result =
-      	  type: type
+          type: type
           left: left
-      	  right: right
+          right: right
     result
 
   expression = ->
