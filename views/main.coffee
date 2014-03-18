@@ -45,6 +45,9 @@ String::tokens = ->
     STRING
     ONELINECOMMENT
     MULTIPLELINECOMMENT
+    COMPARISONOPERATORS
+    ADDOP
+    MULTOP
     ONECHAROPERATORS
   ]
   RESERVED_WORD = 
@@ -151,6 +154,7 @@ parse = (input) ->
 
   block = ->
     resultarr = []
+
     if lookahead and lookahead.type is "CONST"
        match "CONST"
        resultconst = [constante()]
@@ -207,28 +211,29 @@ parse = (input) ->
        match ";"
        resultarr.concat resultvar
 
-    if lookahead and lookahead.type is "procedure"
-       while lookahead and lookahead.type is "procedure"
+    if lookahead and lookahead.type is "procedure"  
+       resultproc = [proced()]
+       proced = ->
+         result = null
          match "procedure"
-         resultwhile = [proced()]
-         proced = ->
-           result = null
-           if lookahead and lookahead.type is "ID"
-             match "ID"
-             match ";"
-             result =
-               type: "Var ID"
-               block: block()
-           else # Error!
-           throw "Syntax Error. Expected ID but found " + 
-             (if lookahead then lookahead.value else "end of input") + 
-             " near '#{input.substr(lookahead.from)}'"
-           result
-       resultproc =
-         procedures: resultwhile
-         statement: statement()
+         if lookahead and lookahead.type is "ID"
+           value = lookahead.value
+           match "ID"
+           match ";"
+           result =
+             type: "Procedure"
+             value: value
+             left: block()
+           match ";"
+         else # Error!
+         throw "Syntax Error. Expected ID but found " + 
+           (if lookahead then lookahead.value else "end of input") + 
+           " near '#{input.substr(lookahead.from)}'"
+         result
+       while lookahead and lookahead.type is "procedure"
+         resultproc.push proced()
+       resultproc.push statement()
        resultarr.concat resultproc
-      
     resultarr
 
   statements = ->
