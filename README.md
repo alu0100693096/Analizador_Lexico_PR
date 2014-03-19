@@ -34,6 +34,7 @@ Se ha repartido el trabajo de la práctica, de una manera más o menos equitativ
 - Estilo *Sass*.
 - Mejora de páginas *slim*.
 - Puesta a punto de sinatra y despliegue en heroku.
+- Añadir *localStorage*.
 
 <span style="color: red; font-weight: bold;">Nota:</span> aunque parezca un reparto desequilibrado, hemos supuesto que el desarrollo del analizador sintáctico conllevaría el mismo trabajo que el resto de tareas (y así ha sido). El reparto difiere en cantidad, no en dificultad.
 
