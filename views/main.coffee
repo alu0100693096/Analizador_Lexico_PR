@@ -1,17 +1,27 @@
 main = ()-> 
   editor = $(".CodeMirror")[0].CodeMirror
   source = editor.getValue()
+    
   try 
     result = JSON.stringify(parse(source), null, 2)
   catch result
     result = """<div class="error">#{result}</div>"""
 
   OUTPUT.innerHTML = result
+  
+  if window.localStorage
+    editor = $(".CodeMirror")[0].CodeMirror
+    localStorage.input = editor.getValue()
+    localStorage.output = result;
 
 window.main = main
 
 window.onload = ()-> 
   PARSE.onclick = main
+  if window.localStorage && localStorage.input && localStorage.output
+    editor = $(".CodeMirror")[0].CodeMirror
+    editor.setValue(localStorage.input)
+    OUTPUT.innerHTML = localStorage.output
 
 Object.constructor::error = (message, t) ->
   t = t or this
@@ -310,11 +320,11 @@ parse = (input) ->
         type: "ODD"
         value: right
     else
-    	left = expression()
-    	type = lookahead.value
-    	match "COMPARISON"
-    	right = expression()
-    	result =
+        left = expression()
+        type = lookahead.value
+        match "COMPARISON"
+        right = expression()
+        result =
           type: type
           left: left
           right: right
