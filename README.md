@@ -3,6 +3,8 @@
 
 El objetivo de la práctica consiste en realizar un ***analizador sintáctico recursivo predictivo*** o *parser* para un el antiguo lenguaje ***PL/0***. Además, se desarrollará como una aplicación *Ruby-Sinatra*, por lo que el despliegue de la página web se hará en *heroku*, al igual que la práctica anterior.
 
+**Nota de implementación:** La "constantes" dentro del fichero .coffee se han declarado con letras mayúsculas.
+
 ## 2. Acceso a la página web ##
 Se puede acceder a la página web de *Heroku* alojada en el siguiente enlace:
 
