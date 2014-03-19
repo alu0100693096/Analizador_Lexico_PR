@@ -36,26 +36,28 @@ ol
 
 ol
   li
-    |  $\Sigma = \{ ; =, ID, P, +, *, (, ), NUM \}$, 
+    |  $\Sigma = \{ ID, NUM, const, ".", ",", =, ;, var, procedure, call, begin, end, if, then, while, do, odd, :=, =, \#, <, <=, >, >=, +, -, *, /, (, ) \}$
   li
     |  $V = \{ program, block, statement, condition, expression, term, factor \}$ 
   li
-    |  Productions: 
+    |  Reglas de producción: 
     ol
 	  li
         |  $program \rightarrow block$ '.'
       li
-        |  $block \rightarrow$ ('const' ident '=' number (',' ident '=' number)* ';')?  ('var' ident (',' ident)* ';')? ('procedure' ident ';' $block$ ';')* $statement$
+        |  $block \rightarrow$ $($'const' $ID$ '=' $NUM$ $($',' $ID$ '=' $NUM$$)$* ';'$)?$  $($'var' $ID$ $($',' $ID$$)$* ';'$)?$ $($'procedure' $ID$ ';' $block$ ';'$)*$ $statement$
       li
-        |  $statement \rightarrow$ ident ':=' $expression  \vert$ "call" ident $\vert$ "begin" ($statement$ ";")+ "end" $\vert$ "if" $condition$ "then" $statement \vert$ "while" $condition$ "do" $statement$
+        |  $statement \rightarrow$ $ID$ ':=' $expression \vert$ 'call' $ID$ $\vert$ 'begin' $(statement$ ';'$)+$ 'end' $\vert$ 'if' $condition$ 'then' $statement \vert$ 'while' $condition$ 'do' $statement$
       li
-        |  expression $ \rightarrow$ term '+' expression $\vert$ term 
+        |  $condition \rightarrow$ 'odd' $expression \vert expression$ $($'='$\vert$'#'$\vert$'<'$\vert$'<='$\vert$'>'$\vert$'>='$)$ $expression$
       li
-        |  term $ \rightarrow$ factor '*' term $\vert$ factor 
+        |  $expression \rightarrow$ $($'+'$\vert$'-'$)$ $term$ $(($'+'$\vert$'-'$)$ $term)*$
       li
-        |  factor $ \rightarrow$ '(' expression ')' $\vert$ ID $ \vert$ NUM 
+        |  $term \rightarrow factor$ $(($'*'$\vert$'/'$)$ $factor)*$
+      li
+        |  $factor \rightarrow$ $ID$ $\vert$ $NUM$ $\vert$ '(' $expression$ ')'
   li
-    |  Start symbol: $statements$ 
+    |  Símbolo de arranque: $program$ 
 br
 br
 br
