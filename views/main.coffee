@@ -8,6 +8,8 @@ main = ()->
 
   OUTPUT.innerHTML = result
 
+window.main = main
+
 window.onload = ()-> 
   PARSE.onclick = main
 
@@ -372,3 +374,5 @@ parse = (input) ->
           "Expected 'end of input' and found '" + 
           input.substr(lookahead.from) + "'"  
   tree
+  
+window.parse = parse
