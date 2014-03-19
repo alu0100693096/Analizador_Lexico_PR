@@ -32,20 +32,22 @@ ol
     i derivados 
     | desde el símbolo de arranque.
 
-| Esta es la gramática para nuestra práctica:
+| Esta es la gramática para nuestra práctica, extraída de la página de wikipedia (véase enlace superior), del lenguaje de programación PL/0:
 
 ol
   li
     |  $\Sigma = \{ ; =, ID, P, +, *, (, ), NUM \}$, 
   li
-    |  $V = \{ statements, statement, expression, term, factor \}$ 
+    |  $V = \{ program, block, statement, condition, expression, term, factor \}$ 
   li
     |  Productions: 
     ol
+	  li
+        |  $program \rightarrow block$ '.'
       li
-        |  statements $ \rightarrow$ statement ';' statements $\vert$ statement 
+        |  $block \rightarrow$ ('const' ident '=' number (',' ident '=' number)* ';')?  ('var' ident (',' ident)* ';')? ('procedure' ident ';' $block$ ';')* $statement$
       li
-        |  statement $ \rightarrow$ ID '=' expression $\vert$ P expression 
+        |  $statement \rightarrow$ ident ':=' $expression  \vert$ "call" ident $\vert$ "begin" ($statement$ ";")+ "end" $\vert$ "if" $condition$ "then" $statement \vert$ "while" $condition$ "do" $statement$
       li
         |  expression $ \rightarrow$ term '+' expression $\vert$ term 
       li
