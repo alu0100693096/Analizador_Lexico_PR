@@ -32,28 +32,32 @@ ol
     i derivados 
     | desde el símbolo de arranque.
 
-| Esta es la gramática para nuestra práctica:
+| Esta es la gramática para nuestra práctica, extraída de la página de wikipedia (véase enlace superior), del lenguaje de programación PL/0:
 
 ol
   li
-    |  $\Sigma = \{ ; =, ID, P, +, *, (, ), NUM \}$, 
+    |  $\Sigma = \{ ID, NUM, const, ".", ",", =, ;, var, procedure, call, begin, end, if, then, while, do, odd, :=, =, \#, <, <=, >, >=, +, -, *, /, (, ) \}$
   li
-    |  $V = \{ statements, statement, expression, term, factor \}$ 
+    |  $V = \{ program, block, statement, condition, expression, term, factor \}$ 
   li
-    |  Productions: 
+    |  Reglas de producción: 
     ol
+	  li
+        |  $program \rightarrow block$ '.'
       li
-        |  statements $ \rightarrow$ statement ';' statements $\vert$ statement 
+        |  $block \rightarrow$ $($'const' $ID$ '=' $NUM$ $($',' $ID$ '=' $NUM$$)$* ';'$)?$  $($'var' $ID$ $($',' $ID$$)$* ';'$)?$ $($'procedure' $ID$ ';' $block$ ';'$)*$ $statement$
       li
-        |  statement $ \rightarrow$ ID '=' expression $\vert$ P expression 
+        |  $statement \rightarrow$ $ID$ ':=' $expression \vert$ 'call' $ID$ $\vert$ 'begin' $(statement$ ';'$)+$ 'end' $\vert$ 'if' $condition$ 'then' $statement \vert$ 'while' $condition$ 'do' $statement$
       li
-        |  expression $ \rightarrow$ term '+' expression $\vert$ term 
+        |  $condition \rightarrow$ 'odd' $expression \vert expression$ $($'='$\vert$'#'$\vert$'<'$\vert$'<='$\vert$'>'$\vert$'>='$)$ $expression$
       li
-        |  term $ \rightarrow$ factor '*' term $\vert$ factor 
+        |  $expression \rightarrow$ $($'+'$\vert$'-'$)$ $term$ $(($'+'$\vert$'-'$)$ $term)*$
       li
-        |  factor $ \rightarrow$ '(' expression ')' $\vert$ ID $ \vert$ NUM 
+        |  $term \rightarrow factor$ $(($'*'$\vert$'/'$)$ $factor)*$
+      li
+        |  $factor \rightarrow$ $ID$ $\vert$ $NUM$ $\vert$ '(' $expression$ ')'
   li
-    |  Start symbol: $statements$ 
+    |  Símbolo de arranque: $program$ 
 br
 br
 br
