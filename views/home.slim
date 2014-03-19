@@ -4,7 +4,7 @@ p This website contains a simple example of a predictive parser
   p
     | Load example to parse
   div
-    textarea#original[autofocus cols="80" rows="5"]
+    textarea#original[autofocus cols="80" rows="5" name="Code"]
   br
   div
     .loadfile
@@ -18,10 +18,18 @@ p This website contains a simple example of a predictive parser
         | example_err
       input#files type="file" 
 
-    javascript:
+    javascript:	
+		var editor = CodeMirror.fromTextArea(document.getElementById("original"), {
+          lineNumbers: true,
+          viewportMargin: Infinity,
+		  mode: "text/x-pascal" // Usamos pascal, que se parece bastante.
+        });
+		
+        // Véase http://stackoverflow.com/questions/8378678/how-can-i-set-the-value-of-a-codemirror-editor-by-javascript
         function dump(fileName) {
           $.get(fileName, function (data) {
-            $("#original").val(data);
+            //$("#original").val(data);
+			editor.setValue(data);
            });
         };
 
@@ -32,7 +40,8 @@ p This website contains a simple example of a predictive parser
             if (file) {
               var reader = new FileReader();
                 reader.onload = function(e) { 
-                  original.innerHTML = e.target.result;
+                  //original.innerHTML = e.target.result;
+				  editor.setValue(e.target.result);
                     }
                     var c = reader.readAsText(file);
                 }
